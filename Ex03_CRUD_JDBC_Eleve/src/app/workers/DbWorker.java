@@ -57,6 +57,7 @@ public class DbWorker implements DbWorkerItf {
 
     private Personne creerPersonne(ResultSet rs) {
 
+        return null;
     }
 
     /**
@@ -83,10 +84,37 @@ public class DbWorker implements DbWorkerItf {
 
     public Personne lire(int i) {
 
+        return null;
     }
 
     public List<Personne> lirePersonnes() {
+        ArrayList<Personne> listePersonnes = new ArrayList<Personne>();
+        Statement st;
+        ResultSet rs;
+        try {
+            st = dbConnexion.createStatement();
+            rs = st.executeQuery("select PK_PERS, Nom, Prenom, Date_naissance, No_rue, Rue, NPA, Salaire, Ville, Actif, date_modif from t_personne");
 
+            while (rs.next()) {
+
+                Personne test = new Personne(rs.getInt("PK_PERS"),
+                        rs.getString("Nom"),
+                        rs.getString("Prenom"),
+                        rs.getDate("Date_naissance"),
+                        rs.getInt("No_rue"),
+                        rs.getString("Rue"),
+                        rs.getInt("NPA"),
+                        rs.getString("Ville"),
+                        rs.getBoolean("Actif"),
+                        rs.getDouble("Salaire"),
+                        rs.getDate("date_modif"));
+                listePersonnes.add(test);
+            }
+
+        } catch (SQLException o) {
+
+        }
+        return listePersonnes;
     }
 
     public void modifier(Personne o) {
