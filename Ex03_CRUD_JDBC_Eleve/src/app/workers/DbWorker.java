@@ -2,11 +2,15 @@ package app.workers;
 
 import app.beans.Personne;
 import app.exceptions.MyDBException;
+import app.helpers.DateTimeLib;
 import app.helpers.SystemLib;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DbWorker implements DbWorkerItf {
 
@@ -39,25 +43,46 @@ public class DbWorker implements DbWorkerItf {
     @Override
     public void connecterBdMySQL(String nomDB) throws MyDBException {
         final String url_local = "jdbc:mysql://localhost:3306/" + nomDB;
-        final String url_remote = "jdbc:mysql://LAPEMFB37-21.edu.net.fr.ch:3306/" + nomDB;
-        final String user = "root";
+        final String url_remote = "jdbc:mysql://172.23.85.187:3306/" + nomDB;
+        final String user = "223";
         final String password = "emf123";
 
-        System.out.println("url:" + url_local);
+        System.out.println("url:" + url_remote);
         try {
-            dbConnexion = DriverManager.getConnection(url_local, user, password);
+            dbConnexion = DriverManager.getConnection(url_remote, user, password);
         } catch (SQLException ex) {
             throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
         }
     }
 
-    public void creer(Personne o) {
+    public void creer(Personne o) throws MyDBException {
+        if (o != null) {
+            String prep = "INSERT INTO t_personne set Nom=?, Prenom=?, Date_naissance=?, No_rue=?, "
+                    + "Rue=?, NPA=?, Salaire=?, Ville=?, Actif=?, date_modif=?";
 
-    }
+            try ( PreparedStatement ps = dbConnexion.prepareStatement(prep)) {
 
-    private Personne creerPersonne(ResultSet rs) {
+                ps.setString(1, o.getNom());
+                ps.setString(2, o.getPrenom());
+                ps.setDate(3, new java.sql.Date(o.getDateNaissance().getTime()));
+                ps.setInt(4, o.getNoRue());
+                ps.setString(5, o.getRue());
+                ps.setInt(6, o.getNpa());
+                ps.setDouble(7, o.getSalaire());
+                ps.setString(8, o.getLocalite());
+                ps.setBoolean(9, o.isActif());
+                ps.setDate(10, new java.sql.Date(o.getDateModif().getTime()));
 
-        return null;
+                int nb = ps.executeUpdate();
+
+                if (nb != 1) {
+                    System.out.println("Erreur de mise à jour !!!");
+                }
+
+            } catch (SQLException ex) {
+                throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -78,22 +103,40 @@ public class DbWorker implements DbWorkerItf {
         }
     }
 
-    public void effacer(Personne o) {
+    @Override
+    public void effacer(Personne o) throws MyDBException {
+        if (o != null) {
+            String prep = "DELETE FROM t_personne where PK_PERS=?";
 
+            try ( PreparedStatement ps = dbConnexion.prepareStatement(prep)) {
+                ps.setInt(1, o.getPkPers());
+
+                int nb = ps.executeUpdate();
+
+                if (nb != 1) {
+                    System.out.println("Erreur de mise à jour !!!");
+                }
+
+            } catch (SQLException ex) {
+                throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
+            }
+        }
     }
 
-    public Personne lire(int i) {
-
-        return null;
+    @Override
+    public Personne lire(int i) throws MyDBException {
+        return lirePersonnes().get(i);
     }
 
-    public List<Personne> lirePersonnes() {
+    @Override
+    public List<Personne> lirePersonnes() throws MyDBException {
         ArrayList<Personne> listePersonnes = new ArrayList<Personne>();
         Statement st;
         ResultSet rs;
         try {
             st = dbConnexion.createStatement();
-            rs = st.executeQuery("select PK_PERS, Nom, Prenom, Date_naissance, No_rue, Rue, NPA, Salaire, Ville, Actif, date_modif from t_personne");
+            rs = st.executeQuery("select PK_PERS, Nom, Prenom, Date_naissance, "
+                    + "No_rue, Rue, NPA, Salaire, Ville, Actif, date_modif from t_personne");
 
             while (rs.next()) {
 
@@ -111,14 +154,42 @@ public class DbWorker implements DbWorkerItf {
                 listePersonnes.add(test);
             }
 
-        } catch (SQLException o) {
-
+        } catch (SQLException ex) {
+            throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
         }
         return listePersonnes;
     }
 
-    public void modifier(Personne o) {
+    @Override
+    public void modifier(Personne o) throws MyDBException {
+        if (o != null) {
+            String prep = "update t_personne set Nom=?, Prenom=?, Date_naissance=?, No_rue=?, "
+                    + "Rue=?, NPA=?, Salaire=?, Ville=?, Actif=?, date_modif=? where PK_PERS=?";
 
+            try ( PreparedStatement ps = dbConnexion.prepareStatement(prep)) {
+
+                ps.setString(1, o.getNom());
+                ps.setString(2, o.getPrenom());
+                ps.setDate(3, new java.sql.Date(o.getDateNaissance().getTime()));
+                ps.setInt(4, o.getNoRue());
+                ps.setString(5, o.getRue());
+                ps.setInt(6, o.getNpa());
+                ps.setDouble(7, o.getSalaire());
+                ps.setString(8, o.getLocalite());
+                ps.setBoolean(9, o.isActif());
+                ps.setDate(10, new java.sql.Date(o.getDateModif().getTime()));
+                ps.setInt(11, o.getPkPers());
+
+                int nb = ps.executeUpdate();
+
+                if (nb != 1) {
+                    System.out.println("Erreur de mise à jour !!!");
+                }
+
+            } catch (SQLException ex) {
+                throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
+            }
+        }
     }
 
 }

@@ -23,32 +23,29 @@ public class PersonneManager {
     }
 
     public Personne courantPersonne() {
-
-        return null;
+        return listePersonnes.get(index);
     }
 
     public Personne debutPersonne() {
-
-        return null;
+        index = 0;
+        return listePersonnes.get(index);
     }
 
     public Personne finPersonne() {
-
-        return null;
+        index = (listePersonnes.size() - 1);
+        return listePersonnes.get(index);
     }
 
     public Personne precedentPersonne() {
-        int ind = index;
-
-        if (ind > 0) {
+        if (index > 0) {
             index--;
         }
 
-        return listePersonnes.get(ind);
+        return listePersonnes.get(index);
     }
 
-    public Personne setPersonnes(List<Personne> o) {
-        this.listePersonnes = o;
+    public Personne setPersonnes(List<Personne> e) {
+        this.listePersonnes = e;
         return listePersonnes.get(0);
     }
 
