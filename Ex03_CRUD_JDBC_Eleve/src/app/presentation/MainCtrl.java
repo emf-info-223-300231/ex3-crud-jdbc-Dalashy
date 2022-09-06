@@ -123,8 +123,11 @@ public class MainCtrl implements Initializable {
 
     @FXML
     private void menuEffacer(ActionEvent event) {
+        Personne pe;
         try {
             dbWrk.effacer(manPers.courantPersonne());
+            pe = manPers.setPersonnes(dbWrk.lirePersonnes());
+            afficherPersonne(pe);
         } catch (MyDBException o) {
             JfxPopup.displayError("ERREUR", "Une erreur s'est produite", o.getMessage());
         }
