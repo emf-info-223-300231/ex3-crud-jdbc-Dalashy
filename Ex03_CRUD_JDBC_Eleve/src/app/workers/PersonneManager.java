@@ -46,7 +46,7 @@ public class PersonneManager {
 
     public Personne setPersonnes(List<Personne> e) {
         this.listePersonnes = e;
-        return listePersonnes.get(0);
+        return courantPersonne();
     }
 
     public Personne suivantPersonne() {
