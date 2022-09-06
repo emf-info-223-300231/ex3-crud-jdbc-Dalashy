@@ -57,8 +57,8 @@ public class DbWorker implements DbWorkerItf {
 
     public void creer(Personne o) throws MyDBException {
         if (o != null) {
-            String prep = "INSERT INTO t_personne set Nom=?, Prenom=?, Date_naissance=?, No_rue=?, "
-                    + "Rue=?, NPA=?, Salaire=?, Ville=?, Actif=?, date_modif=?";
+            String prep = "INSERT INTO t_personne (Nom, Prenom, Date_naissance, No_rue, "
+                    + "Rue, NPA, Salaire, Ville, Actif, date_modif) VALUES (?,?,?,?,?,?,?,?,?,?);";
 
             try ( PreparedStatement ps = dbConnexion.prepareStatement(prep)) {
 
